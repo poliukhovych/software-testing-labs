@@ -26,9 +26,17 @@ pub struct TwoPointLineInput {
 
 #[derive(Debug)]
 pub enum InputError {
-    OutOfRange { name: &'static str, value: i32 },
-    DegenerateTwoPointLine { which: &'static str },
-    ZeroDirectionComponent { which: &'static str, component: &'static str },
+    OutOfRange {
+        name: &'static str,
+        value: i32,
+    },
+    DegenerateTwoPointLine {
+        which: &'static str,
+    },
+    ZeroDirectionComponent {
+        which: &'static str,
+        component: &'static str,
+    },
 }
 
 impl InputError {
@@ -60,9 +68,18 @@ pub fn validate_inputs(
     l3: CanonLineInput,
 ) -> Result<(), InputError> {
     for (name, v) in [
-        ("x11", l1.p1.x), ("y11", l1.p1.y), ("x12", l1.p2.x), ("y12", l1.p2.y),
-        ("x21", l2.p1.x), ("y21", l2.p1.y), ("x22", l2.p2.x), ("y22", l2.p2.y),
-        ("x0", l3.x0), ("y0", l3.y0), ("l", l3.l), ("m", l3.m),
+        ("x11", l1.p1.x),
+        ("y11", l1.p1.y),
+        ("x12", l1.p2.x),
+        ("y12", l1.p2.y),
+        ("x21", l2.p1.x),
+        ("y21", l2.p1.y),
+        ("x22", l2.p2.x),
+        ("y22", l2.p2.y),
+        ("x0", l3.x0),
+        ("y0", l3.y0),
+        ("l", l3.l),
+        ("m", l3.m),
     ] {
         if v < MIN_PARAM || v > MAX_PARAM {
             return Err(InputError::OutOfRange { name, value: v });
@@ -70,17 +87,27 @@ pub fn validate_inputs(
     }
 
     if l1.p1 == l1.p2 {
-        return Err(InputError::DegenerateTwoPointLine { which: "перша" });
+        return Err(InputError::DegenerateTwoPointLine {
+            which: "перша"
+        });
     }
     if l2.p1 == l2.p2 {
-        return Err(InputError::DegenerateTwoPointLine { which: "друга" });
+        return Err(InputError::DegenerateTwoPointLine {
+            which: "друга"
+        });
     }
 
     if l3.l == 0 {
-        return Err(InputError::ZeroDirectionComponent { which: "третя", component: "l" });
+        return Err(InputError::ZeroDirectionComponent {
+            which: "третя",
+            component: "l",
+        });
     }
     if l3.m == 0 {
-        return Err(InputError::ZeroDirectionComponent { which: "третя", component: "m" });
+        return Err(InputError::ZeroDirectionComponent {
+            which: "третя",
+            component: "m",
+        });
     }
 
     Ok(())
@@ -100,7 +127,10 @@ impl Rat {
             num = -num;
         }
         let g = gcd_i64(num.abs(), den);
-        Rat { num: num / g, den: den / g }
+        Rat {
+            num: num / g,
+            den: den / g,
+        }
     }
 
     pub fn is_int(&self) -> bool {
@@ -134,7 +164,7 @@ impl PointR {
     }
 }
 
-fn fmt_rat(r: Rat) -> String {
+pub fn fmt_rat(r: Rat) -> String {
     if r.den == 1 {
         format!("{}", r.num)
     } else {
@@ -183,9 +213,17 @@ impl LineABC {
         let mut b = self.b / g;
         let mut c = self.c / g;
 
-        let sign = if a != 0 { a.signum() } else if b != 0 { b.signum() } else { c.signum() };
+        let sign = if a != 0 {
+            a.signum()
+        } else if b != 0 {
+            b.signum()
+        } else {
+            c.signum()
+        };
         if sign < 0 {
-            a = -a; b = -b; c = -c;
+            a = -a;
+            b = -b;
+            c = -c;
         }
         (a, b, c)
     }
@@ -269,7 +307,10 @@ mod tests {
     use super::*;
 
     fn mk_two_point(x1: i32, y1: i32, x2: i32, y2: i32) -> TwoPointLineInput {
-        TwoPointLineInput { p1: PointI { x: x1, y: y1 }, p2: PointI { x: x2, y: y2 } }
+        TwoPointLineInput {
+            p1: PointI { x: x1, y: y1 },
+            p2: PointI { x: x2, y: y2 },
+        }
     }
     fn mk_can(x0: i32, y0: i32, l: i32, m: i32) -> CanonLineInput {
         CanonLineInput { x0, y0, l, m }
@@ -284,305 +325,391 @@ mod tests {
     }
 
     // усі три співпадають
-    #[test] fn ec_all_coincident_left() {
-        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1);
-        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1);
+    #[test]
+    fn ec_all_coincident_left() {
+        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1);
+        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1);
         let l3 = mk_can(MIN_PARAM, MIN_PARAM, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
-    #[test] fn ec_all_coincident_right() {
-        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM-1, MAX_PARAM-1);
-        let l2 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM-1, MAX_PARAM-1);
+    #[test]
+    fn ec_all_coincident_right() {
+        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM - 1, MAX_PARAM - 1);
+        let l2 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM - 1, MAX_PARAM - 1);
         let l3 = mk_can(MAX_PARAM, MAX_PARAM, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
-    #[test] fn ec_all_coincident_typical() {
+    #[test]
+    fn ec_all_coincident_typical() {
         let l1 = mk_two_point(0, 0, 1, 1);
         let l2 = mk_two_point(2, 2, 3, 3);
         let l3 = mk_can(5, 5, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
-    #[test] fn ec_all_coincident_mix_near_left_mid_right() {
-        let l1 = mk_two_point(MIN_PARAM+1, MIN_PARAM+1, 0, 0);
+    #[test]
+    fn ec_all_coincident_mix_near_left_mid_right() {
+        let l1 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 1, 0, 0);
         let l2 = mk_two_point(10, 10, 20, 20);
         let l3 = mk_can(MAX_PARAM, MAX_PARAM, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
-    #[test] fn ec_all_coincident_two_near_left_next_and_mid() {
-        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+2, MIN_PARAM+2);
-        let l2 = mk_two_point(MIN_PARAM+1, MIN_PARAM+1, MIN_PARAM+3, MIN_PARAM+3);
+    #[test]
+    fn ec_all_coincident_two_near_left_next_and_mid() {
+        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 2, MIN_PARAM + 2);
+        let l2 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 1, MIN_PARAM + 3, MIN_PARAM + 3);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
-    #[test] fn ec_all_coincident_two_near_right_prev_and_mid() {
-        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM-2, MAX_PARAM-2);
-        let l2 = mk_two_point(MAX_PARAM-1, MAX_PARAM-1, MAX_PARAM-3, MAX_PARAM-3);
+    #[test]
+    fn ec_all_coincident_two_near_right_prev_and_mid() {
+        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM - 2, MAX_PARAM - 2);
+        let l2 = mk_two_point(MAX_PARAM - 1, MAX_PARAM - 1, MAX_PARAM - 3, MAX_PARAM - 3);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::AllCoincident));
+        assert!(matches!(build(l1, l2, l3), Placement::AllCoincident));
     }
 
     // 0 точок перетину (усі три паралельні та різні)
-    #[test] fn ec_no_intersections_left() {
-        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1); // y=x
-        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1, MIN_PARAM+2); // y=x+1
-        let l3 = mk_can(MIN_PARAM, MIN_PARAM+2, 1, 1); // y=x+2
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
+    #[test]
+    fn ec_no_intersections_left() {
+        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1); // y=x
+        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1, MIN_PARAM + 2); // y=x+1
+        let l3 = mk_can(MIN_PARAM, MIN_PARAM + 2, 1, 1); // y=x+2
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
     }
 
-    #[test] fn ec_no_intersections_right() {
-        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM-1, MAX_PARAM-1); // y=x
-        let l2 = mk_two_point(MAX_PARAM, MAX_PARAM-1, MAX_PARAM-1, MAX_PARAM-2); // y=x-1
-        let l3 = mk_can(MAX_PARAM, MAX_PARAM-2, 1, 1); // y=x-2
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
+    #[test]
+    fn ec_no_intersections_right() {
+        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM - 1, MAX_PARAM - 1); // y=x
+        let l2 = mk_two_point(MAX_PARAM, MAX_PARAM - 1, MAX_PARAM - 1, MAX_PARAM - 2); // y=x-1
+        let l3 = mk_can(MAX_PARAM, MAX_PARAM - 2, 1, 1); // y=x-2
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
     }
 
-    #[test] fn ec_no_intersections_typical() {
-        let l1 = mk_two_point(0, 0, 1, 1);         // y=x
-        let l2 = mk_two_point(0, 1, 1, 2);         // y=x+1
-        let l3 = mk_can(0, 2, 1, 1);               // y=x+2
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
-    }
-
-    #[test] fn ec_no_intersections_mix() {
-        let l1 = mk_two_point(MIN_PARAM+1, MIN_PARAM+1, 0, 0); // y=x
-        let l2 = mk_two_point(10, 11, 20, 21);                 // y=x+1
-        let l3 = mk_can(MAX_PARAM, MAX_PARAM-1, 1, 1);         // y=x-1
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
-    }
-
-    #[test] fn ec_no_intersections_two_near_left_next_and_mid() {
-        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+2, MIN_PARAM+2); // y=x
-        let l2 = mk_two_point(MIN_PARAM+1, MIN_PARAM+2, MIN_PARAM+3, MIN_PARAM+4); // y=x+1
+    #[test]
+    fn ec_no_intersections_typical() {
+        let l1 = mk_two_point(0, 0, 1, 1); // y=x
+        let l2 = mk_two_point(0, 1, 1, 2); // y=x+1
         let l3 = mk_can(0, 2, 1, 1); // y=x+2
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
     }
 
-    #[test] fn ec_no_intersections_two_near_right_prev_and_mid() {
-        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM-2, MAX_PARAM-2); // y=x
-        let l2 = mk_two_point(MAX_PARAM-1, MAX_PARAM-2, MAX_PARAM-3, MAX_PARAM-4); // y=x-1
+    #[test]
+    fn ec_no_intersections_mix() {
+        let l1 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 1, 0, 0); // y=x
+        let l2 = mk_two_point(10, 11, 20, 21); // y=x+1
+        let l3 = mk_can(MAX_PARAM, MAX_PARAM - 1, 1, 1); // y=x-1
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
+    }
+
+    #[test]
+    fn ec_no_intersections_two_near_left_next_and_mid() {
+        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 2, MIN_PARAM + 2); // y=x
+        let l2 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 2, MIN_PARAM + 3, MIN_PARAM + 4); // y=x+1
+        let l3 = mk_can(0, 2, 1, 1); // y=x+2
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
+    }
+
+    #[test]
+    fn ec_no_intersections_two_near_right_prev_and_mid() {
+        let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM - 2, MAX_PARAM - 2); // y=x
+        let l2 = mk_two_point(MAX_PARAM - 1, MAX_PARAM - 2, MAX_PARAM - 3, MAX_PARAM - 4); // y=x-1
         let l3 = mk_can(0, 1, 1, 1); // y=x+1
-        assert!(matches!(build(l1,l2,l3), Placement::NoIntersections));
+        assert!(matches!(build(l1, l2, l3), Placement::NoIntersections));
     }
 
     // 1 точка перетину
-    #[test] fn ec_one_point_leftish() {
+    #[test]
+    fn ec_one_point_leftish() {
         let l1 = mk_two_point(-1, -1, 1, 1); // y=x
         let l2 = mk_two_point(-1, 1, 1, -1); // y=-x
         let l3 = mk_can(0, 0, 1, 2);
-        match build(l1,l2,l3) {
-            Placement::OnePoint(p) => assert_eq!(p, PointR { x: Rat::new(0,1), y: Rat::new(0,1) }),
+        match build(l1, l2, l3) {
+            Placement::OnePoint(p) => assert_eq!(
+                p,
+                PointR {
+                    x: Rat::new(0, 1),
+                    y: Rat::new(0, 1)
+                }
+            ),
             _ => panic!("expected one point"),
         }
     }
 
-    #[test] fn ec_one_point_rightish() {
-        let l1 = mk_two_point(MAX_PARAM-1, MAX_PARAM-1, MAX_PARAM, MAX_PARAM);
-        let l2 = mk_two_point(MAX_PARAM-1, MAX_PARAM, MAX_PARAM, MAX_PARAM-1);
-        let l1 = mk_two_point(10,10, 11,11);
-        let l2 = mk_two_point(10,10, 11,9);
-        let l3 = mk_can(10,10, 1,2);
-        assert!(matches!(build(l1,l2,l3), Placement::OnePoint(_)));
+    #[test]
+    fn ec_one_point_rightish() {
+        let _l1 = mk_two_point(MAX_PARAM - 1, MAX_PARAM - 1, MAX_PARAM, MAX_PARAM);
+        let _l2 = mk_two_point(MAX_PARAM - 1, MAX_PARAM, MAX_PARAM, MAX_PARAM - 1);
+        let l1 = mk_two_point(10, 10, 11, 11);
+        let l2 = mk_two_point(10, 10, 11, 9);
+        let l3 = mk_can(10, 10, 1, 2);
+        assert!(matches!(build(l1, l2, l3), Placement::OnePoint(_)));
     }
 
-    #[test] fn ec_one_point_typical() {
+    #[test]
+    fn ec_one_point_typical() {
         let l1 = mk_two_point(0, 0, 2, 2);
         let l2 = mk_two_point(0, 0, 2, -2);
         let l3 = mk_can(0, 0, 2, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::OnePoint(_)));
+        assert!(matches!(build(l1, l2, l3), Placement::OnePoint(_)));
     }
 
-    #[test] fn ec_one_point_mix() {
-        let l1 = mk_two_point(MIN_PARAM+1, MIN_PARAM+1, MIN_PARAM+2, MIN_PARAM+2);
-        let l2 = mk_two_point(MIN_PARAM+1, MIN_PARAM+1, MIN_PARAM+2, MIN_PARAM);
-        let l3 = mk_can(MIN_PARAM+1, MIN_PARAM+1, 1, 2);
-        assert!(matches!(build(l1,l2,l3), Placement::OnePoint(_)));
+    #[test]
+    fn ec_one_point_mix() {
+        let l1 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 1, MIN_PARAM + 2, MIN_PARAM + 2);
+        let l2 = mk_two_point(MIN_PARAM + 1, MIN_PARAM + 1, MIN_PARAM + 2, MIN_PARAM);
+        let l3 = mk_can(MIN_PARAM + 1, MIN_PARAM + 1, 1, 2);
+        assert!(matches!(build(l1, l2, l3), Placement::OnePoint(_)));
     }
 
-    #[test] fn ec_one_point_two_near_left_next_and_mid() {
+    #[test]
+    fn ec_one_point_two_near_left_next_and_mid() {
         let l1 = mk_two_point(-1, -1, 1, 1);
         let l2 = mk_two_point(-1, -1, 1, -3);
         let l3 = mk_can(-1, -1, 1, 3);
-        assert!(matches!(build(l1,l2,l3), Placement::OnePoint(_)));
+        assert!(matches!(build(l1, l2, l3), Placement::OnePoint(_)));
     }
 
-    #[test] fn ec_one_point_two_near_right_prev_and_mid() {
+    #[test]
+    fn ec_one_point_two_near_right_prev_and_mid() {
         let l1 = mk_two_point(1, 1, 2, 2);
         let l2 = mk_two_point(1, 1, 2, 0);
         let l3 = mk_can(1, 1, 2, 3);
-        assert!(matches!(build(l1,l2,l3), Placement::OnePoint(_)));
+        assert!(matches!(build(l1, l2, l3), Placement::OnePoint(_)));
     }
 
     // 2 точки перетину
-    #[test] fn ec_two_points_typical() {
-        let l1 = mk_two_point(0, 0, 1, 1);     // y=x
-        let l2 = mk_two_point(0, 1, 1, 2);     // y=x+1
+    #[test]
+    fn ec_two_points_typical() {
+        let l1 = mk_two_point(0, 0, 1, 1); // y=x
+        let l2 = mk_two_point(0, 1, 1, 2); // y=x+1
         let l3 = mk_can(0, 0, 1, -1);
-        match build(l1,l2,l3) {
-            Placement::TwoPoints(p1,p2) => {
-                let a = PointR { x: Rat::new(-1,2), y: Rat::new(1,2) };
-                let b = PointR { x: Rat::new(0,1), y: Rat::new(0,1) };
-                assert!( (p1==a && p2==b) || (p1==b && p2==a) );
+        match build(l1, l2, l3) {
+            Placement::TwoPoints(p1, p2) => {
+                let a = PointR {
+                    x: Rat::new(-1, 2),
+                    y: Rat::new(1, 2),
+                };
+                let b = PointR {
+                    x: Rat::new(0, 1),
+                    y: Rat::new(0, 1),
+                };
+                assert!((p1 == a && p2 == b) || (p1 == b && p2 == a));
             }
             _ => panic!("expected two points"),
         }
     }
 
-    #[test] fn ec_two_points_leftish() {
-        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1); // y=x
-        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM+1, MIN_PARAM+1, MIN_PARAM+2); // y=x+1
+    #[test]
+    fn ec_two_points_leftish() {
+        let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1); // y=x
+        let l2 = mk_two_point(MIN_PARAM, MIN_PARAM + 1, MIN_PARAM + 1, MIN_PARAM + 2); // y=x+1
         let l3 = mk_can(0, 0, 1, -1); // y=-x
-        assert!(matches!(build(l1,l2,l3), Placement::TwoPoints(_, _)));
+        assert!(matches!(build(l1, l2, l3), Placement::TwoPoints(_, _)));
     }
 
-    #[test] fn ec_two_points_rightish() {
-        let l1 = mk_two_point(MAX_PARAM-1, MAX_PARAM-1, MAX_PARAM, MAX_PARAM);
-        let l2 = mk_two_point(MAX_PARAM-1, MAX_PARAM, MAX_PARAM, MAX_PARAM+1);
+    #[test]
+    fn ec_two_points_rightish() {
+        let l1 = mk_two_point(MAX_PARAM - 1, MAX_PARAM - 1, MAX_PARAM, MAX_PARAM);
+        let _l2 = mk_two_point(MAX_PARAM - 1, MAX_PARAM, MAX_PARAM, MAX_PARAM + 1);
         let l2 = mk_two_point(10, 11, 11, 12);
         let l3 = mk_can(0, 0, 1, -1);
-        assert!(matches!(build(l1,l2,l3), Placement::TwoPoints(_, _)));
+        assert!(matches!(build(l1, l2, l3), Placement::TwoPoints(_, _)));
     }
 
-    #[test] fn ec_two_points_mix() {
+    #[test]
+    fn ec_two_points_mix() {
         let l1 = mk_two_point(10, 10, 11, 11); // y=x
         let l2 = mk_two_point(10, 11, 11, 12); // y=x+1
         let l3 = mk_can(5, -5, 1, -1);
-        assert!(matches!(build(l1,l2,l3), Placement::TwoPoints(_, _)));
+        assert!(matches!(build(l1, l2, l3), Placement::TwoPoints(_, _)));
     }
 
-    #[test] fn ec_two_points_two_near_left_next_and_mid() {
+    #[test]
+    fn ec_two_points_two_near_left_next_and_mid() {
         let l1 = mk_two_point(-2, -2, -1, -1);
         let l2 = mk_two_point(-2, -1, -1, 0);
         let l3 = mk_can(0, 0, 1, -1);
-        assert!(matches!(build(l1,l2,l3), Placement::TwoPoints(_, _)));
+        assert!(matches!(build(l1, l2, l3), Placement::TwoPoints(_, _)));
     }
 
-    #[test] fn ec_two_points_two_near_right_prev_and_mid() {
+    #[test]
+    fn ec_two_points_two_near_right_prev_and_mid() {
         let l1 = mk_two_point(2, 2, 3, 3);
         let l2 = mk_two_point(2, 3, 3, 4);
         let l3 = mk_can(0, 0, 1, -1);
-        assert!(matches!(build(l1,l2,l3), Placement::TwoPoints(_, _)));
+        assert!(matches!(build(l1, l2, l3), Placement::TwoPoints(_, _)));
     }
 
     // 3 точки перетину
-    #[test] fn ec_three_points_typical() {
+    #[test]
+    fn ec_three_points_typical() {
         let l1 = mk_two_point(0, -1, 0, 1); // x=0
         let l2 = mk_two_point(-1, 0, 1, 0); // y=0
         let l3 = mk_can(0, 1, 1, 1);
-        match build(l1,l2,l3) {
-            Placement::ThreePoints(p1,p2,p3) => {
-                let s: BTreeSet<PointR> = [p1,p2,p3].into_iter().collect();
+        match build(l1, l2, l3) {
+            Placement::ThreePoints(p1, p2, p3) => {
+                let s: BTreeSet<PointR> = [p1, p2, p3].into_iter().collect();
                 let e: BTreeSet<PointR> = [
-                    PointR{ x: Rat::new(0,1), y: Rat::new(0,1) },
-                    PointR{ x: Rat::new(0,1), y: Rat::new(1,1) },
-                    PointR{ x: Rat::new(-1,1), y: Rat::new(0,1) },
-                ].into_iter().collect();
+                    PointR {
+                        x: Rat::new(0, 1),
+                        y: Rat::new(0, 1),
+                    },
+                    PointR {
+                        x: Rat::new(0, 1),
+                        y: Rat::new(1, 1),
+                    },
+                    PointR {
+                        x: Rat::new(-1, 1),
+                        y: Rat::new(0, 1),
+                    },
+                ]
+                .into_iter()
+                .collect();
                 assert_eq!(s, e);
             }
             _ => panic!("expected three points"),
         }
     }
 
-    #[test] fn ec_three_points_leftish() {
-        let l1 = mk_two_point(0, MIN_PARAM, 0, MIN_PARAM+1);
-        let l2 = mk_two_point(MIN_PARAM, 0, MIN_PARAM+1, 0);
-        let l3 = mk_can(MIN_PARAM, MIN_PARAM+1, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::ThreePoints(_,_,_)));
+    #[test]
+    fn ec_three_points_leftish() {
+        let l1 = mk_two_point(0, MIN_PARAM, 0, MIN_PARAM + 1);
+        let l2 = mk_two_point(MIN_PARAM, 0, MIN_PARAM + 1, 0);
+        let l3 = mk_can(MIN_PARAM, MIN_PARAM + 1, 1, 1);
+        assert!(matches!(build(l1, l2, l3), Placement::ThreePoints(_, _, _)));
     }
 
-    #[test] fn ec_three_points_rightish() {
-        let l1 = mk_two_point(0, MAX_PARAM-1, 0, MAX_PARAM);
-        let l2 = mk_two_point(MAX_PARAM-1, 0, MAX_PARAM, 0);
-        let l3 = mk_can(MAX_PARAM-1, MAX_PARAM, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::ThreePoints(_,_,_)));
+    #[test]
+    fn ec_three_points_rightish() {
+        let l1 = mk_two_point(0, MAX_PARAM - 1, 0, MAX_PARAM);
+        let l2 = mk_two_point(MAX_PARAM - 1, 0, MAX_PARAM, 0);
+        let l3 = mk_can(MAX_PARAM - 1, MAX_PARAM, 1, 1);
+        assert!(matches!(build(l1, l2, l3), Placement::ThreePoints(_, _, _)));
     }
 
-    #[test] fn ec_three_points_mix() {
+    #[test]
+    fn ec_three_points_mix() {
         let l1 = mk_two_point(0, -10, 0, 10);
         let l2 = mk_two_point(-10, 0, 10, 0);
         let l3 = mk_can(5, 6, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::ThreePoints(_,_,_)));
+        assert!(matches!(build(l1, l2, l3), Placement::ThreePoints(_, _, _)));
     }
 
-    #[test] fn ec_three_points_two_near_left_next_and_mid() {
+    #[test]
+    fn ec_three_points_two_near_left_next_and_mid() {
         let l1 = mk_two_point(0, -2, 0, -1);
         let l2 = mk_two_point(-2, 0, -1, 0);
         let l3 = mk_can(0, 1, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::ThreePoints(_,_,_)));
+        assert!(matches!(build(l1, l2, l3), Placement::ThreePoints(_, _, _)));
     }
 
-    #[test] fn ec_three_points_two_near_right_prev_and_mid() {
+    #[test]
+    fn ec_three_points_two_near_right_prev_and_mid() {
         let l1 = mk_two_point(0, 2, 0, 3);
         let l2 = mk_two_point(2, 0, 3, 0);
         let l3 = mk_can(0, 1, 1, 1);
-        assert!(matches!(build(l1,l2,l3), Placement::ThreePoints(_,_,_)));
+        assert!(matches!(build(l1, l2, l3), Placement::ThreePoints(_, _, _)));
     }
 
     // INVALID equivalence classes (out-of-range, співпадаючі точки, l=0 або m=0)
-    #[test] fn ie_out_of_range_left() {
-        let l1 = mk_two_point(MIN_PARAM-1, 0, 0, 1);
+    #[test]
+    fn ie_out_of_range_left() {
+        let l1 = mk_two_point(MIN_PARAM - 1, 0, 0, 1);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::OutOfRange{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::OutOfRange { .. })
+        ));
     }
 
-    #[test] fn ie_out_of_range_right() {
-        let l1 = mk_two_point(MAX_PARAM+1, 0, 0, 1);
+    #[test]
+    fn ie_out_of_range_right() {
+        let l1 = mk_two_point(MAX_PARAM + 1, 0, 0, 1);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::OutOfRange{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::OutOfRange { .. })
+        ));
     }
 
-    #[test] fn ie_out_of_range_typical() {
+    #[test]
+    fn ie_out_of_range_typical() {
         let l1 = mk_two_point(0, 0, 1, 1);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 123, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::OutOfRange{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::OutOfRange { .. })
+        ));
     }
 
-    #[test] fn ie_coincident_points_left() {
+    #[test]
+    fn ie_coincident_points_left() {
         let l1 = mk_two_point(MIN_PARAM, MIN_PARAM, MIN_PARAM, MIN_PARAM);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::DegenerateTwoPointLine{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::DegenerateTwoPointLine { .. })
+        ));
     }
 
-    #[test] fn ie_coincident_points_right() {
+    #[test]
+    fn ie_coincident_points_right() {
         let l1 = mk_two_point(MAX_PARAM, MAX_PARAM, MAX_PARAM, MAX_PARAM);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::DegenerateTwoPointLine{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::DegenerateTwoPointLine { .. })
+        ));
     }
 
-    #[test] fn ie_coincident_points_typical() {
+    #[test]
+    fn ie_coincident_points_typical() {
         let l1 = mk_two_point(0, 0, 0, 0);
         let l2 = mk_two_point(0, 0, 1, 1);
         let l3 = mk_can(0, 0, 1, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::DegenerateTwoPointLine{..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::DegenerateTwoPointLine { .. })
+        ));
     }
 
-    #[test] fn ie_zero_l_left() {
+    #[test]
+    fn ie_zero_l_left() {
         let l1 = mk_two_point(0, 0, 1, 1);
         let l2 = mk_two_point(0, 1, 1, 0);
         let l3 = mk_can(0, 0, 0, 1);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::ZeroDirectionComponent{component: "l", ..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::ZeroDirectionComponent { component: "l", .. })
+        ));
     }
 
-    #[test] fn ie_zero_m_right() {
+    #[test]
+    fn ie_zero_m_right() {
         let l1 = mk_two_point(0, 0, 1, 1);
         let l2 = mk_two_point(0, 1, 1, 0);
         let l3 = mk_can(0, 0, 1, 0);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(InputError::ZeroDirectionComponent{component: "m", ..})));
+        assert!(matches!(
+            validate_inputs(l1, l2, l3),
+            Err(InputError::ZeroDirectionComponent { component: "m", .. })
+        ));
     }
 
-    #[test] fn ie_zero_direction_typical() {
+    #[test]
+    fn ie_zero_direction_typical() {
         let l1 = mk_two_point(0, 0, 1, 1);
         let l2 = mk_two_point(0, 1, 1, 0);
         let l3 = mk_can(0, 0, 0, 0);
-        assert!(matches!(validate_inputs(l1,l2,l3), Err(_)));
+        assert!(matches!(validate_inputs(l1, l2, l3), Err(_)));
     }
 }
